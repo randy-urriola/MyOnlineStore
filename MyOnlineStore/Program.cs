@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyOnlineStore.Context;
+using MyOnlineStore.Repositories;
+using MyOnlineStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlString"));
 });
+
+builder.Services.AddScoped(typeof(GenericRepository<>));
+builder.Services.AddScoped<CategoryService>();
 
 var app = builder.Build();
 
