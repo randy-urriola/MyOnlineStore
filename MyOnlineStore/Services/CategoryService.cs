@@ -36,7 +36,7 @@ namespace MyOnlineStore.Services
             var category = await _categoryRepository.GetByIdAsync(id);
             var categoryVM = new CategoryVM();
 
-            if (category != null) 
+            if (category != null)
             {
                 categoryVM.Name = category.Name;
                 categoryVM.CategoryId = category.CategoryId;
@@ -53,6 +53,12 @@ namespace MyOnlineStore.Services
                 Name = viewModel.Name,
             };
             await _categoryRepository.EditAsync(entity);
+        }
+
+        public async Task DeleteAsync(int id) // Elimina una categoria de la BD
+        {
+            var category = await _categoryRepository.GetByIdAsync(id);
+            await _categoryRepository.DeleteAsync(category);
         }
     }
 }

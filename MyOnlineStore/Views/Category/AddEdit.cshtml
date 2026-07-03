@@ -1,9 +1,14 @@
 ﻿@model CategoryVM
 
+@{
+    var title = Model.CategoryId == 0 ? "New Category" : "Edit Category";
+    var btnAction = Model.CategoryId == 0 ? "Add" : "Save";
+}
+
 <div class="row">
     <div class="col-6">
 
-        <h2>New Category</h2>
+        <h2>@title</h2>
         <hr />
         <form action="/Category/AddEdit" method="post">
             <input type="hidden" asp-for="CategoryId" />
@@ -21,7 +26,7 @@
             }
 
             <div class="d-grid gap-2 d-md-block mt-4">
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">@btnAction</button>
                 <a href="/Category/Index" class="btn btn-warning">Back</a>
             </div>
         </form>
