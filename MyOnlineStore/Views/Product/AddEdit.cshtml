@@ -28,7 +28,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Description</label>
-                <input type="text" class="form-control" asp-for="Description" autocomplete="off" />
+                <textarea id="summernote" class="form-control" asp-for="Description" autocomplete="off" ></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
@@ -67,3 +67,22 @@
         <img src="~/images/@Model.ImageName" class="rounded" width="300" height="320" alt="@Model.Name" />
     </div>
 </div>
+
+
+@section Styles {
+    <link href="~/lib/summernote/dist/summernote.min.css" rel="stylesheet" />
+    <link href="~/lib/summernote/dist/summernote-bs5.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script src="~/lib/summernote/dist/summernote.min.js"></script>
+    <script src="~/lib/summernote/dist/summernote-bs5.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#summernote').summernote({
+                height: 200
+
+            });
+        });
+    </script>
+}

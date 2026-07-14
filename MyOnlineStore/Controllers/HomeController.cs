@@ -1,21 +1,43 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineStore.Models;
+using MyOnlineStore.Services;
 
 namespace MyOnlineStore.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(
+        CategoryService _categoryService,
+        ProductService _productService
+        ) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        
 
-        public HomeController(ILogger<HomeController> logger)
+        public async Task<IActionResult> Index()
         {
-            _logger = logger;
+            var categories = await _categoryService.GetAllAsync();
+            var products = await _productService.GetCatalogAsync();
+            var catalog = new CatalogVM { Categories = categories, Products = products };
+            return View(catalog);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> FilterByCategory(int id, string name)
         {
-            return View();
+            var categories = await _categoryService.GetAllAsync();
+            var products = await _productService.GetCatalogAsync(categoryId:id);
+
+            var catalog = new CatalogVM { Categories = categories, Products = products, filterBy=name};
+            return View("Index",catalog);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> FilterBySearch(string value)
+        {
+            var categories = await _categoryService.GetAllAsync();
+            var products = await _productService.GetCatalogAsync(search: value);
+
+            var catalog = new CatalogVM { Categories = categories, Products = products, filterBy = $"Results for: {value}" };
+            return View("Index", catalog);
         }
 
         public IActionResult Privacy()

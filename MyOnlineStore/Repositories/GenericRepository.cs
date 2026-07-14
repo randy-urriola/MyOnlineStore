@@ -14,11 +14,17 @@ namespace MyOnlineStore.Repositories
         }
 
         // devuelve una entidad anidada con sus relaciones, si no la encuentra devuelve null
-        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, object>>[] includes) 
+        public async Task<IEnumerable<TEntity>> GetAllAsync(
+            Expression<Func<TEntity, bool>>[]? conditions = null,
+            Expression<Func<TEntity, object>>[]? includes = null) 
         {
             IQueryable<TEntity> query = _dbContext.Set<TEntity>(); // prepara un select * from TEntity pero aun no lo ejecuta
 
-            foreach (var include in includes) query = query.Include(include); // agrega los includes a la consulta como si fuera un inner join
+            if (conditions is not null)
+                foreach (var condition in conditions) query = query.Where(condition);
+
+            if (includes is not null)
+                foreach (var include in includes) query = query.Include(include); // agrega los includes a la consulta como si fuera un inner join
 
             return await query.ToListAsync();
         }
