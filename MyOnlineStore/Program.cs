@@ -18,6 +18,9 @@ builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
 
+// Memoria temporal o base de datos temporal para mantener los items del carrito
+builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +28,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
+
+app.UseSession();
 app.UseRouting();
 
 app.UseAuthorization();

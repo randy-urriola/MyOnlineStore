@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineStore.Models;
 using MyOnlineStore.Services;
+using MyOnlineStore.Utilities;
 
 namespace MyOnlineStore.Controllers
 {
@@ -38,6 +39,41 @@ namespace MyOnlineStore.Controllers
 
             var catalog = new CatalogVM { Categories = categories, Products = products, filterBy = $"Results for: {value}" };
             return View("Index", catalog);
+        }
+
+        public async Task<IActionResult> ProductDetail(int id)
+        {
+            var product = await _productService.GetByIdAsync(id);
+            return View(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddItemToCart(int productId, int quantity)
+        {
+            var product = await _productService.GetByIdAsync(productId);
+
+            var cart = HttpContext.Session.Get<List<CartItemVM>>("Cart") ?? new List<CartItemVM>(); // si no hay carrito lo inicializa
+
+            if (cart.Find(x => x.ProductId == productId) == null)
+            {
+                cart.Add(new CartItemVM
+                {
+                    ProductId = productId,
+                    ImageName = product.Name,
+                    Name = product.Name,
+                    Price = product.Price,
+                    Quantity = quantity
+                });
+            }
+            else
+            {
+                var updateProduct = cart.Find(x => x.ProductId == productId);
+                updateProduct!.Quantity += quantity;
+            }
+
+            HttpContext.Session.Set("Cart", cart);
+            ViewBag.message = "Product added to cart";
+            return View("ProductDetail", product);
         }
 
         public IActionResult Privacy()
