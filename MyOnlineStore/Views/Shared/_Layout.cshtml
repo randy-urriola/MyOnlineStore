@@ -33,6 +33,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Products</a>
                         </li>
                         
+                        @await Html.PartialAsync("_CartButton")
                     </ul>
                 </div>
             </div>

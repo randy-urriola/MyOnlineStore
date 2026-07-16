@@ -9,7 +9,8 @@ namespace MyOnlineStore.Controllers
 {
     public class HomeController(
         CategoryService _categoryService,
-        ProductService _productService
+        ProductService _productService,
+        OrderService _orderService
         ) : Controller
     {
         
@@ -59,7 +60,7 @@ namespace MyOnlineStore.Controllers
                 cart.Add(new CartItemVM
                 {
                     ProductId = productId,
-                    ImageName = product.Name,
+                    ImageName = product.ImageName,
                     Name = product.Name,
                     Price = product.Price,
                     Quantity = quantity
@@ -76,7 +77,36 @@ namespace MyOnlineStore.Controllers
             return View("ProductDetail", product);
         }
 
-        public IActionResult Privacy()
+        public IActionResult ViewCart()
+        {
+            var cart = HttpContext.Session.Get<List<CartItemVM>>("Cart") ?? new List<CartItemVM>();
+            return View(cart);
+        }
+
+        public IActionResult RemoveItemToCart(int productId)
+        {
+            var cart = HttpContext.Session.Get<List<CartItemVM>>("Cart");
+
+            var product = cart.Find(x => x.ProductId == productId);
+            cart.Remove(product!);
+            HttpContext.Session.Set("Cart", cart);
+
+            return View("ViewCart",cart);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PayNow()
+        {
+            var cart = HttpContext.Session.Get<List<CartItemVM>>("Cart");
+
+            //TODO: change id
+            int userId = 1;
+            await _orderService.AddAsync(cart, userId);
+
+            return View("SaleCompleted");
+        }
+
+        public IActionResult SaleCompleted()
         {
             return View();
         }
