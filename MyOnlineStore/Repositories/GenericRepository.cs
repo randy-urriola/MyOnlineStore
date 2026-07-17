@@ -16,7 +16,7 @@ namespace MyOnlineStore.Repositories
         // devuelve una entidad anidada con sus relaciones, si no la encuentra devuelve null
         public async Task<IEnumerable<TEntity>> GetAllAsync(
             Expression<Func<TEntity, bool>>[]? conditions = null,
-            Expression<Func<TEntity, object>>[]? includes = null) 
+            Expression<Func<TEntity, object>>[]? includes = null)
         {
             IQueryable<TEntity> query = _dbContext.Set<TEntity>(); // prepara un select * from TEntity pero aun no lo ejecuta
 
@@ -54,6 +54,18 @@ namespace MyOnlineStore.Repositories
         {
             _dbContext.Set<TEntity>().Remove(entity);
             await _dbContext.SaveChangesAsync();
+        }
+
+        // valida que hay usuario por contrasenia y devuelve si existe
+        public async Task<TEntity?> GetByFilter(
+            Expression<Func<TEntity, bool>>[] conditions)
+        {
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>(); // prepara un select * from TEntity pero aun no lo ejecuta
+
+            if (conditions is not null)
+                foreach (var condition in conditions) query = query.Where(condition);
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }

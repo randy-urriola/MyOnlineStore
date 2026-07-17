@@ -103,6 +103,8 @@ namespace MyOnlineStore.Controllers
             int userId = 1;
             await _orderService.AddAsync(cart, userId);
 
+            HttpContext.Session.Remove("Cart"); // limpia la sesion despues de comprar
+
             return View("SaleCompleted");
         }
 

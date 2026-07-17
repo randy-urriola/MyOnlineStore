@@ -1,4 +1,5 @@
-﻿using MyOnlineStore.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyOnlineStore.Context;
 using MyOnlineStore.Entities;
 
 namespace MyOnlineStore.Repositories
@@ -18,7 +19,7 @@ namespace MyOnlineStore.Repositories
 
             try
             {
-                foreach(var detail in order.OrderItems)
+                foreach (var detail in order.OrderItems)
                 {
                     var product = await _dbContext.Product.FindAsync(detail.ProductId);
                     product.Stock -= detail.Quantity;
@@ -34,6 +35,14 @@ namespace MyOnlineStore.Repositories
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        // Historial de todas las ordenes de un usuario en especifico
+        public async Task<IEnumerable<Order>> GetAllWithDetailAsync(int userId)
+        {
+            var orders = await _dbContext.Order.Where(x => x.UserId == userId)
+                .Include(x => x.OrderItems).ThenInclude(x => x.Product).ToListAsync();
+            return orders;
         }
     }
 }

@@ -19,6 +19,7 @@ builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<UserService>();
 
 // Memoria temporal o base de datos temporal para mantener los items del carrito
 builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
