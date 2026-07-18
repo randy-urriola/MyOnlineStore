@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyOnlineStore.Models;
 using MyOnlineStore.Services;
 
 namespace MyOnlineStore.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductController(ProductService _productService) : Controller
     {
         public async Task<IActionResult> Index()

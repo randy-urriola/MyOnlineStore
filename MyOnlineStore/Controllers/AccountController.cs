@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyOnlineStore.Models;
 using MyOnlineStore.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace MyOnlineStore.Controllers
 {
@@ -13,9 +16,9 @@ namespace MyOnlineStore.Controllers
         }
 
         [HttpPost]
-        public async  Task<IActionResult> Login(LoginVM viewmodel) 
+        public async Task<IActionResult> Login(LoginVM viewmodel)
         {
-            
+
             if (!ModelState.IsValid) return View(viewmodel);
             var found = await _userService.Login(viewmodel);
 
@@ -26,6 +29,22 @@ namespace MyOnlineStore.Controllers
             }
             else
             {
+                List<Claim> claims = new List<Claim>()
+                {
+                    new Claim(ClaimTypes.NameIdentifier,found.UserId.ToString()),
+                    new Claim(ClaimTypes.Name,found.FullName),
+                    new Claim(ClaimTypes.Email,found.Email),
+                    new Claim(ClaimTypes.Role,found.Type)
+                };
+
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    new AuthenticationProperties() { AllowRefresh = true }
+                    );
+
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -48,12 +67,19 @@ namespace MyOnlineStore.Controllers
                 ViewBag.Message = "Your account has been registered, please try logging in.";
                 ViewBag.Class = "alert-success";
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ViewBag.Message = ex.Message;
                 ViewBag.Class = "alert-danger";
             }
 
             return View();
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MyOnlineStore.Context;
 using MyOnlineStore.Repositories;
@@ -23,6 +24,15 @@ builder.Services.AddScoped<UserService>();
 
 // Memoria temporal o base de datos temporal para mantener los items del carrito
 builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+
+// Autenticacion basica por cookies ()
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+    options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.AccessDeniedPath = "/Home/Error";
+    });
 
 var app = builder.Build();
 

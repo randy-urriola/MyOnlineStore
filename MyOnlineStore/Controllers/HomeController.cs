@@ -1,9 +1,9 @@
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MyOnlineStore.Models;
 using MyOnlineStore.Services;
 using MyOnlineStore.Utilities;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace MyOnlineStore.Controllers
 {
@@ -99,9 +99,8 @@ namespace MyOnlineStore.Controllers
         {
             var cart = HttpContext.Session.Get<List<CartItemVM>>("Cart");
 
-            //TODO: change id
-            int userId = 1;
-            await _orderService.AddAsync(cart, userId);
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            await _orderService.AddAsync(cart, int.Parse(userId));
 
             HttpContext.Session.Remove("Cart"); // limpia la sesion despues de comprar
 
